@@ -52,6 +52,8 @@ NSString* ReadDeviceID() {
 @property (nonatomic, readonly) BOOL canMakeTextStandardSize;
 - (IBAction)makeTextStandardSize:(id)sender;
 - (void)updateNetReach:(SCNetworkConnectionFlags)flags;
+
+@property (weak) IBOutlet NSMenu *statusBarMenu;
 @end
 
 
@@ -83,6 +85,7 @@ static void NetReachCallback(SCNetworkReachabilityRef target,
   BOOL                 _needsReload;
   BOOL                 _webAppIsFunctional;
   BOOL                 _needsJSInjection;
+  NSStatusItem*        _statusItem;
 }
 
 const CGFloat kTitlebarHeightAtDefaultScale = 50;
@@ -277,6 +280,8 @@ const CGFloat kTitlebarHeightAtDefaultScale = 50;
 
   [self reloadFromServer:self];
   [self initNetReachObservation];
+  
+  [self setupStatusItem];
 }
 
 
@@ -1074,5 +1079,13 @@ decisionListener:(id<WebPolicyDecisionListener>)listener
   [[NSWorkspace sharedWorkspace] openURL:url];
 }
 
+#pragma mark - Status Bar Item
 
+- (void)setupStatusItem {
+  NSStatusBar *systemStatusBar = [NSStatusBar systemStatusBar];
+  _statusItem = [systemStatusBar statusItemWithLength:NSVariableStatusItemLength];
+  [_statusItem setHighlightMode:YES];
+  [_statusItem setImage:[NSImage imageNamed:@"StatusBarIcon"]];
+  [_statusItem setMenu:self.statusBarMenu];
+}
 @end
